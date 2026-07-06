@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Page</title>
+    <link rel="stylesheet" href="/static/encyclopedia/styles.css">
+</head>
+<body>
+    <h1>Create New Page</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Title" required>
+        <textarea name="content" placeholder="Content" required></textarea>
+        <input type="submit" value="Create">
+    </form>
+</body>
+</html>

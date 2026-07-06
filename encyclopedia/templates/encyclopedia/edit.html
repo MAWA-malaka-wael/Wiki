@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit {{ title }}</title>
+    <link rel="stylesheet" href="/static/encyclopedia/styles.css">
+</head>
+<body>
+    <h1>Edit {{ title }}</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <textarea name="content" placeholder="Enter content" required></textarea>
+        <input type="submit" value="Save">
+    </form>
+</body>
+</html>
