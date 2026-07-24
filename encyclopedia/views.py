@@ -1,60 +1,69 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+import markdown2
+import random
+
+from . import util
+
+
 def index(request):
-    # This function runs when someone visits the homepage
-    # request is information about what the user asked for
-    
-    entries = ["Python", "HTML", "CSS", "Git", "Django"]
-    # This is a list of all encyclopedia entries
-    
     return render(request, "encyclopedia/index.html", {
-        # This tells Django: take the index.html template and fill it with data
-        "entries": entries
-        # Send the entries list to the template so it can display them
+        "entries": util.list_entries()
     })
 
+
 def entry(request, title):
+    content = util.get_entry(title)
+    if content is None:
+        return render(request, "encyclopedia/error.html", {
+            "title": title
+        })
     return render(request, "encyclopedia/entry.html", {
         "title": title,
-        "content": "Content for " + title
+        "content": markdown2.markdown(content)
     })
+
+
 def search(request):
     query = request.GET.get("q", "")
-    entries = ["Python", "HTML", "CSS", "Git", "Django"]
+    entries = util.list_entries()
+    if query in entries:
+        return HttpResponseRedirect(reverse("entry", args=[query]))
     results = [e for e in entries if query.lower() in e.lower()]
     return render(request, "encyclopedia/search.html", {
         "query": query,
         "results": results
     })
+
+
 def new_page(request):
     if request.method == "POST":
         title = request.POST.get("title")
         content = request.POST.get("content")
-        entries = ["Python", "HTML", "CSS", "Git", "Django"]
-        entries.append(title)
-        return render(request, "encyclopedia/entry.html", {
-            "title": title,
-            "content": content
-        })
+        entries = util.list_entries()
+        if title in entries:
+            return render(request, "encyclopedia/new.html", {
+                "error": "An entry with this title already exists."
+            })
+        util.save_entry(title, content)
+        return HttpResponseRedirect(reverse("entry", args=[title]))
     return render(request, "encyclopedia/new.html", {})
+
+
 def edit_page(request, title):
-    entries = ["Python", "HTML", "CSS", "Git", "Django"]
-    if title not in entries:
-        return render(request, "encyclopedia/error.html", {})
     if request.method == "POST":
         content = request.POST.get("content")
-        return render(request, "encyclopedia/entry.html", {
-            "title": title,
-            "content": content
-        })
-    return render(request, "encyclopedia/edit.html", {"title": title})
-import random
+        util.save_entry(title, content)
+        return HttpResponseRedirect(reverse("entry", args=[title]))
+    content = util.get_entry(title)
+    return render(request, "encyclopedia/edit.html", {
+        "title": title,
+        "content": content
+    })
+
 
 def random_page(request):
-    entries = ["Python", "HTML", "CSS", "Git", "Django"]
+    entries = util.list_entries()
     title = random.choice(entries)
-    return render(request, "encyclopedia/entry.html", {
-        "title": title,
-        "content": "Content for " + title
-    })
+    return HttpResponseRedirect(reverse("entry", args=[title]))

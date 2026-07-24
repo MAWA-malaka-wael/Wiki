@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encyclopedia</title>
     <link rel="stylesheet" href="/static/encyclopedia/styles.css">
 </head>
 <body>
-    <form action="/search" method="get">
-        <input type="text" name="q" placeholder="Search">
-        <input type="submit" value="Search">
-    </form>
-    <h1>Encyclopedia</h1>
-    <ul>
-    {% for entry in entries %}
-        <li><a href="/wiki/{{ entry }}">{{ entry }}</a></li>
-    {% endfor %}
-    </ul>
+    <div class="container">
+        <h1>Encyclopedia</h1>
+        <form action="{% url 'search' %}" method="get">
+            <input type="text" name="q" placeholder="Search">
+            <input type="submit" value="Search">
+        </form>
+        <ul>
+        {% for entry in entries %}
+            <li><a href="{% url 'entry' entry %}">{{ entry }}</a></li>
+        {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>
